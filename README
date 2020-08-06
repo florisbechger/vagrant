@@ -8,11 +8,6 @@
 # I use VirtualBox to host CentOS8 and/or Fedora32 nodes to test ansible or bash scripts
 # I hope you enjoy my scripts and look forward to your testing, itterations and comments
 
-# I'll be working on 4 public branches:
-
-# Vagrant scripts for VirtualBox
-# Ansible scripts for CentOS
-# Bash scripts for CentOS
-# Powershell scripts for Windows
+# Vagrant scripts for setting up nodes in VirtualBox
 
 # Cheers
