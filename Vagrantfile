@@ -144,6 +144,14 @@ nodes = [
 
     # config.vm.provision "shell", path: node[:addon]
 
+#   Clear Page Cache, dentries and inodes:
+
+    config.vm.provision "shell", inline: "sudo sync; echo 3 > /proc/sys/vm/drop_caches"
+
+#   Clear Bash history:
+
+    config.vm.provision "shell", inline: "history -c"
+
 #   System reboot:
 
 #    config.vm.provision "shell", inline: "sudo systemctl reboot", name: "Automatic reboot"
