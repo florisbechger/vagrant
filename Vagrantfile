@@ -7,7 +7,7 @@ Vagrant.require_version ">= 2.2.9"
 Vagrant.configure("2") do |config|
 
 nodes = [
-    { hostname:'toaster', publan:'192.168.0.90', pubgw:'192.168.0.1', prilan:'10.0.2.90', prigw:'10.0.2.1', nat:'NatNetwork', cpu:'2', mem:'4096', vram:'16', graphic:'VBoxVGA', acc3d:'off', box:'centos.box', disk:'32GB', addon:'C:\Users\Floris\Google Drive\scripts\centos\toaster.sh' },
+    { hostname:'toaster', publan:'192.168.0.90', pubgw:'192.168.0.1', prilan:'10.0.2.90', prigw:'10.0.2.1', nat:'NatNetwork', cpu:'2', mem:'4096', vram:'16', graphic:'VBoxVGA', acc3d:'off', box:'centos.box', disk:'32GB', addon:'' },
 #    { [another node] },
     ]
 
@@ -105,13 +105,9 @@ nodes = [
 #    config.vm.provision "shell", inline: "sudo dnf upgrade --sec-severity Critical --best -y" # upgrade security patches
 #    config.vm.provision "shell", inline: "sudo dnf upgrade -y" # full system update
 
-#	Main packages installation:
-
-    config.vm.provision "shell", inline: "sudo dnf install chrony nano tree wget --best -y"
-
 #	Chrony configuration:
 
-    config.vm.provision "shell", inline: "sudo dnf install chrony"
+    config.vm.provision "shell", inline: "sudo dnf install chrony --best -y"
 
     config.vm.provision "shell", inline: "sudo cp /etc/chrony.conf chrony.bak"
     config.vm.provision "shell", inline: "sudo echo '# Customized configuration:' > /etc/chrony.conf"
@@ -140,9 +136,13 @@ nodes = [
     config.vm.provision "shell", inline: "sudo systemctl restart chronyd"
     config.vm.provision "shell", inline: "sudo systemctl enable chronyd"
 
+#	Main packages installation:
+
+    config.vm.provision "shell", inline: "sudo dnf install nano tree wget --best -y"
+
 #	Additional Package installation:
 
-    config.vm.provision "shell", path: node[:addon]
+    # config.vm.provision "shell", path: node[:addon]
 
 #   System reboot:
 
