@@ -37,7 +37,7 @@ nodes = [
 #    config.disksize.size = node[:disk]
 
     config.vm.network "private_network", :adapter=>2, ip:node[:prilan], gateway:node[:prigw], virtualbox__intnet:node[:nat]
-    config.vm.network "public_network", :adapter=>3, ip:node[:publan], gateway:node[:pubgw], virtualbox__intnet:node[:nat]
+    config.vm.network "public_network", :adapter=>3, ip:node[:publan], gateway:node[:pubgw] #, virtualbox__intnet:node[:nat]
     config.vm.network "forwarded_port", guest: 22, host: 22, auto_correct: true
 
       config.vm.provider:virtualbox do |vb|
