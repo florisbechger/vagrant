@@ -7,13 +7,13 @@ Vagrant.require_version ">= 2.2.9"
 Vagrant.configure("2") do |config|
 
 nodes = [
-    { hostname:'toaster', publan:'192.168.0.90', pubgw:'192.168.0.1', prilan:'10.0.2.90', prigw:'10.0.2.1', nat:'NatNetwork', cpu:'2', mem:'4096', vram:'16', graphic:'VBoxVGA', acc3d:'off', box:'centos.box', disk:'32GB', addon:'' },
+    { hostname:'toaster', publan:'192.168.0.90', pubgw:'192.168.0.1', prilan:'10.0.2.90', prigw:'10.0.2.1', nat:'NatNetwork', cpu:'2', mem:'4096', vram:'16', graphic:'VBoxVGA', acc3d:'off', box:'centos.box', disk:'40GB', addon:'[path\to\test.sh]' },
 #    { [another node] },
     ]
 
   nodes.each do |node|
 
-#	Nodes configuration:
+# Nodes configuration:
 
     config.vagrant.host = "windows"
     config.vm.provider "virtualbox"
@@ -50,12 +50,12 @@ nodes = [
         vb.customize ["modifyvm", :id, "--description", node[:prilan]]
       end
 
-#	TimeDate configuration:
+# TimeDate configuration:
 
     config.vm.provision "shell", inline: "sudo timedatectl set-timezone Europe/Amsterdam"
     config.vm.provision "shell", inline: "sudo hwclock -w"
 
-#	Security configuration:
+# Security configuration:
 
     config.vm.provision "shell", inline: "sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config"
     config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=dns"
@@ -64,7 +64,7 @@ nodes = [
     config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=ptp"
     config.vm.provision "shell", inline: "sudo firewall-cmd --reload"
 
-#	Modify Network configurations:
+# Modify Network configurations:
 
     config.vm.provision "shell", inline: "sudo nmcli connection modify 'System enp0s8' ifname enp0s8 con-name enp0s8"
     config.vm.provision "shell", inline: "sudo nmcli connection modify 'System enp0s9' ifname enp0s9 con-name enp0s9"
@@ -77,26 +77,26 @@ nodes = [
     config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s9' connection.autoconnect yes"
     config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s9' ipv6.method ignore"
 
-#   Cleanup Network Profiles:
+# Cleanup Network Profiles:
 
     config.vm.provision "shell", inline: "sudo systemctl restart systemd-hostnamed"
     config.vm.provision "shell", inline: "sudo systemctl restart NetworkManager"
 
-#	Journal log files configuration:
+# Journal log files configuration:
 
     config.vm.provision "shell", inline: "sudo cp /etc/systemd/journald.conf journald.bak"
     config.vm.provision "shell", inline: "sudo sed -i 's/#SystemMaxUse=/SystemMaxUse=100M/g' /etc/systemd/journald.conf"
     config.vm.provision "shell", inline: "sudo sed -i 's/#SystemMaxFileSize=/SystemMaxFileSize=100M/g' /etc/systemd/journald.conf"
     config.vm.provision "shell", inline: "sudo sed -i 's/#SystemMaxFiles=/SystemMaxFiles=/g' /etc/systemd/journald.conf"
 
-#	SSH configuration:
+# SSH configuration:
 
     config.vm.provision "shell", inline: "sudo cp /etc/ssh/sshd_config sshd_config.bak"
     config.vm.provision "shell", inline: "sudo systemctl restart sshd.service"
     config.vm.provision "shell", inline: "sudo systemctl enable sshd.service"
 #    config.vm.provision "shell", inline: "sudo echo 'UseDNS no' >> /etc/ssh/sshd_config"
 
-#   Update system:
+# Update system:
 
     config.vm.provision "shell", inline: "sudo dnf clean all -y" # clean the DNF package repositorycaches
     config.vm.provision "shell", inline: "sudo dnf makecache -y" # update the DNF package repository cache
@@ -105,7 +105,7 @@ nodes = [
 #    config.vm.provision "shell", inline: "sudo dnf upgrade --sec-severity Critical --best -y" # upgrade security patches
 #    config.vm.provision "shell", inline: "sudo dnf upgrade -y" # full system update
 
-#	Chrony configuration:
+# Chrony configuration:
 
     config.vm.provision "shell", inline: "sudo dnf install chrony --best -y"
 
@@ -136,25 +136,25 @@ nodes = [
     config.vm.provision "shell", inline: "sudo systemctl restart chronyd"
     config.vm.provision "shell", inline: "sudo systemctl enable chronyd"
 
-#	Main packages installation:
+# Main packages installation:
 
     config.vm.provision "shell", inline: "sudo dnf install nano tree wget --best -y"
 
-#	Additional Package installation:
+# Additional Package installation:
 
     # config.vm.provision "shell", path: node[:addon]
 
-#   Clear Page Cache, dentries and inodes:
+# Clear Page Cache, dentries and inodes:
 
     config.vm.provision "shell", inline: "sudo sync; echo 3 > /proc/sys/vm/drop_caches"
 
-#   Clear Bash history:
+# Clear Bash history:
 
     config.vm.provision "shell", inline: "history -c"
 
-#   System reboot:
+# System reboot:
 
-#    config.vm.provision "shell", inline: "sudo systemctl reboot", name: "Automatic reboot"
+    config.vm.provision "shell", inline: "sudo systemctl reboot", name: "Automatic reboot"
 
     end
   end
