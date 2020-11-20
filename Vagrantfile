@@ -111,17 +111,31 @@ nodes = [
 
 #	Chrony configuration:
 
+    config.vm.provision "shell", inline: "sudo dnf install chrony"
+
     config.vm.provision "shell", inline: "sudo cp /etc/chrony.conf chrony.bak"
     config.vm.provision "shell", inline: "sudo echo '# Customized configuration:' > /etc/chrony.conf"
-    config.vm.provision "shell", inline: "sudo echo 'pool 0.nl.pool.ntp.org iburst' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo '# allow 192.168.0.0/16' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '# driftfile /var/lib/chrony/drift' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo '# ntsdumpdir /var/lib/chrony' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '# server time.cloudflare.com iburst nts' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '# server nts.sth1.ntp.se iburst nts' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '# server nts.sth2.ntp.se iburst nts' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo 'pool nl.pool.ntp.org iburst' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '0.nl.pool.ntp.org iburst' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '1.nl.pool.ntp.org iburst' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '2.nl.pool.ntp.org iburst' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '3.nl.pool.ntp.org iburst' >> /etc/chrony.conf"
+
     config.vm.provision "shell", inline: "sudo echo 'makestep 1.0 3' >> /etc/chrony.conf"
     config.vm.provision "shell", inline: "sudo echo 'rtcsync' >> /etc/chrony.conf"
     config.vm.provision "shell", inline: "sudo echo 'local stratum 8' >> /etc/chrony.conf"
     config.vm.provision "shell", inline: "sudo echo 'keyfile /etc/chrony.keys' >> /etc/chrony.conf"
     config.vm.provision "shell", inline: "sudo echo 'leapsectz right/UTC' >> /etc/chrony.conf"
     config.vm.provision "shell", inline: "sudo echo 'logdir /var/log/chrony' >> /etc/chrony.conf"
-#    config.vm.provision "shell", inline: "sudo echo 'driftfile /var/lib/chrony/drift' >> /etc/chrony.conf"
-#    config.vm.provision "shell", inline: "sudo echo 'allow 192.168.0.0/16' >> /etc/chrony.conf"
 
     config.vm.provision "shell", inline: "sudo systemctl restart chronyd"
     config.vm.provision "shell", inline: "sudo systemctl enable chronyd"
