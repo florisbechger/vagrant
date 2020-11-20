@@ -20,8 +20,9 @@ REM vagrant box remove centos.box -f
 vagrant box add centos.box file:///C:\Users\[username]\Documents\Vagrant\centos.box
 
 # Provision your VirtualBox with new nodes:
-vagrant up # build a complete new node(s)
-vagrant up --no-provision # build your new node without provisioning
+vagrant up # build your new node(s) + provisioning
+vagrant up --no-provision # build your new node(s) without provisioning
+vagrant provision # provisioning only, no builds
 vagrant reload --provision # only provision the allready created nodes
 
 # Some commands:
