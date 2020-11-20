@@ -10,10 +10,12 @@ cd C:\Users\[username]\Documents\Vagrant
 # List your Vagrant images:
 vagrant box list
 
-# Create a virtual node in VirtualBox and make sure all files go into this directory
 # Create an image of your freshly installed instance, e.g.:
 
 vagrant package --base centos --output centos.box
+
+# Remove image:
+# vagrant box remove centos.box -f
 
 # Register this image to Vagrant, so it knows where to pull the image from:
 vagrant box add centos.box file:///C:\Users\[username]\Documents\Vagrant\centos.box
