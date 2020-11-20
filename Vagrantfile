@@ -1,4 +1,4 @@
-# Place in your Vagrant folder
+# Vagrantfile 2020/11/20
 
 Vagrant.require_version ">= 2.2.9"
 
