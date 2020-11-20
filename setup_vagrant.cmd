@@ -10,22 +10,25 @@ cd C:\Users\[username]\Documents\Vagrant
 # List your Vagrant images:
 vagrant box list
 
-# Create an image of your freshly installed instance, e.g.:
+# Create an image of your VirtualBox instance, e.g.:
 
 vagrant package --base centos --output centos.box
 
 # Remove image:
-# vagrant box remove centos.box -f
+REM vagrant box remove centos.box -f
 
 # Register this image to Vagrant, so it knows where to pull the image from:
+
 vagrant box add centos.box file:///C:\Users\[username]\Documents\Vagrant\centos.box
 
-# Now you can provision your VirtualBox with new nodes:
+# Provision your VirtualBox with new nodes:
+
 vagrant up # build a complete new node
 vagrant up --no-provision # build your new node without provisioning
 vagrant reload --provision # only provision the allready created nodes
 
 # Some commands:
+
 REM VBoxManage startvm <machine> --type headless # start node without GUI
 REM vagrant reload <machine> # restart node
 REM vagrant halt <machine> # stop node
