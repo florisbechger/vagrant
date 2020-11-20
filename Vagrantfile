@@ -7,7 +7,7 @@ Vagrant.require_version ">= 2.2.9"
 Vagrant.configure("2") do |config|
 
 nodes = [
-    { hostname:'toaster', publan:'192.168.0.90', pubgw:'192.168.0.1', prilan:'10.0.2.90', prigw:'10.0.2.1', nat:'NatNetwork', cpu:'2', mem:'4096', vram:'16', graphic:'VBoxVGA', acc3d:'off', box:'centos.box', disk:'40GB', addon:'[path\to\test.sh]' },
+    { hostname:'test', publan:'192.168.0.90', pubgw:'192.168.0.1', prilan:'10.0.2.90', prigw:'10.0.2.1', nat:'NatNetwork', cpu:'2', mem:'4096', vram:'16', graphic:'VBoxVGA', acc3d:'off', box:'centos.box', disk:'40GB', addon:'[path\to\test.sh]' },
 #    { [another node] },
     ]
 
@@ -36,8 +36,8 @@ nodes = [
 #    config.vm.disk :disk, name = node[:hostname]
 #    config.disksize.size = node[:disk]
 
-    config.vm.network "private_network", :adapter=>2, ip:node[:prilan], gateway:node[:prigw] #, virtualbox__intnet:node[:nat]
-    config.vm.network "public_network", :adapter=>3, ip:node[:publan], gateway:node[:pubgw] #, virtualbox__intnet:node[:nat]
+    config.vm.network "private_network", :adapter=>2, ip:node[:prilan], gateway:node[:prigw], virtualbox__intnet:node[:nat]
+    config.vm.network "public_network", :adapter=>3, ip:node[:publan], gateway:node[:pubgw], virtualbox__intnet:node[:nat]
     config.vm.network "forwarded_port", guest: 22, host: 22, auto_correct: true
 
       config.vm.provider:virtualbox do |vb|
@@ -111,14 +111,7 @@ nodes = [
 
     config.vm.provision "shell", inline: "sudo cp /etc/chrony.conf chrony.bak"
     config.vm.provision "shell", inline: "sudo echo '# Customized configuration:' > /etc/chrony.conf"
-
-    config.vm.provision "shell", inline: "sudo echo '# allow 192.168.0.0/16' >> /etc/chrony.conf"
-    config.vm.provision "shell", inline: "sudo echo '# driftfile /var/lib/chrony/drift' >> /etc/chrony.conf"
-
-    config.vm.provision "shell", inline: "sudo echo '# ntsdumpdir /var/lib/chrony' >> /etc/chrony.conf"
-    config.vm.provision "shell", inline: "sudo echo '# server time.cloudflare.com iburst nts' >> /etc/chrony.conf"
-    config.vm.provision "shell", inline: "sudo echo '# server nts.sth1.ntp.se iburst nts' >> /etc/chrony.conf"
-    config.vm.provision "shell", inline: "sudo echo '# server nts.sth2.ntp.se iburst nts' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
 
     config.vm.provision "shell", inline: "sudo echo 'pool nl.pool.ntp.org iburst' >> /etc/chrony.conf"
     config.vm.provision "shell", inline: "sudo echo '0.nl.pool.ntp.org iburst' >> /etc/chrony.conf"
@@ -126,8 +119,15 @@ nodes = [
     config.vm.provision "shell", inline: "sudo echo '2.nl.pool.ntp.org iburst' >> /etc/chrony.conf"
     config.vm.provision "shell", inline: "sudo echo '3.nl.pool.ntp.org iburst' >> /etc/chrony.conf"
 
+    config.vm.provision "shell", inline: "sudo echo '# ntsdumpdir /var/lib/chrony' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '# server time.cloudflare.com iburst nts' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '# server nts.sth1.ntp.se iburst nts' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '# server nts.sth2.ntp.se iburst nts' >> /etc/chrony.conf"
+
+#    config.vm.provision "shell", inline: "sudo echo 'driftfile /var/lib/chrony/drift' >> /etc/chrony.conf"
     config.vm.provision "shell", inline: "sudo echo 'makestep 1.0 3' >> /etc/chrony.conf"
     config.vm.provision "shell", inline: "sudo echo 'rtcsync' >> /etc/chrony.conf"
+#    config.vm.provision "shell", inline: "sudo echo 'allow 192.168.0.0/16' >> /etc/chrony.conf"
     config.vm.provision "shell", inline: "sudo echo 'local stratum 8' >> /etc/chrony.conf"
     config.vm.provision "shell", inline: "sudo echo 'keyfile /etc/chrony.keys' >> /etc/chrony.conf"
     config.vm.provision "shell", inline: "sudo echo 'leapsectz right/UTC' >> /etc/chrony.conf"
