@@ -1,4 +1,4 @@
-# Setup Vagrant environment to host virtual nodes in Windows command prompt
+# Setup Vagrant environment to host virtual CentOS nodes in Windows command prompt
 
 cls
 REM Windows commands:
