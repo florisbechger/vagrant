@@ -1,6 +1,6 @@
 # Vagrantfile 2020/11/20
 # VirtualBox Version 6.1.16
-# Vagrant Version 2.2.13
+# Vagrant Version 2.2.14
 
 Vagrant.require_version ">= 2.2.13"
 
