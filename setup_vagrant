@@ -1,7 +1,13 @@
 # Setup Vagrant environment to host virtual CentOS nodes in Windows command prompt
 
+# Download and install Vagrant from:
+https://www.vagrantup.com/downloads
+
+# Open Command Prompt:
 cls
-REM Windows commands:
+
+# Plugin install:
+vagrant plugin install vagrant-disksize
 
 # Make main directory for Vagrant and change to this directory, change [username] to your own username:
 md C:\Users\[username]\Documents\Vagrant
