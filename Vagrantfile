@@ -2,9 +2,11 @@
 # VirtualBox Version 6.1.16
 # Vagrant Version 2.2.14
 
-Vagrant.require_version ">= 2.2.13"
+Vagrant.require_version ">= 2.2.14"
 
 # dns servers: 8.8.8.8 8.8.4.4 (Google)
+# dns servers: 89.101.251.228 89.101.251.229 (Ziggo)
+# dns servers: 194.109.6.66 194.109.9.99 194.109.104.104 (xs4all)
 
 Vagrant.configure("2") do |config|
 
@@ -34,9 +36,7 @@ nodes = [
     config.vm.hostname = node[:hostname]
     config.vm.base_address = node[:prilan]
 
-#    config.vm.disk :disk, name: node[:hostname] # , disk_ext: "vdi"
-#    config.vm.disk :disk, name = node[:hostname]
-#    config.disksize.size = node[:disk]
+#    config.disksize.size = node[:disk] # Results in Read-only filesystem!
 
     config.vm.network "private_network", :adapter=>2, ip:node[:prilan], gateway:node[:prigw], virtualbox__intnet:node[:nat]
     config.vm.network "public_network", :adapter=>3, type: "dhcp"
