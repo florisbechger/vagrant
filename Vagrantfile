@@ -4,14 +4,10 @@
 
 Vagrant.require_version ">= 2.2.14"
 
-# dns servers: 8.8.8.8 8.8.4.4 (Google)
-# dns servers: 89.101.251.228 89.101.251.229 (Ziggo)
-# dns servers: 194.109.6.66 194.109.9.99 194.109.104.104 (xs4all)
-
 Vagrant.configure("2") do |config|
 
 nodes = [
-    { hostname:'test', prilan:'10.0.2.90', prigw:'10.0.2.1', nat:'NatNetwork', cpu:'2', mem:'4096', vram:'16', graphic:'VBoxVGA', acc3d:'off', box:'centos.box', disk:'40GB', addon:'[path\to\test.sh]' },
+    { hostname:'test', prilan:'10.0.2.90', seclan:'10.0.2.91', gw:'10.0.2.1', int:'intnet', cpu:'2', mem:'4096', vram:'16', graphic:'VBoxVGA', acc3d:'off', box:'centos.box', disk:'40GB', addon:'[path\to\test.sh]', dns: '89.101.251.228 89.101.251.229'},
 #    { [another node] },
     ]
 
@@ -34,13 +30,16 @@ nodes = [
     config.vm.define node[:hostname] do |config|
     config.vm.box = node[:box]
     config.vm.hostname = node[:hostname]
+
+    config.disksize.size = node[:disk]
+
     config.vm.base_address = node[:prilan]
+    config.vm.network "private_network", :adapter=>2, ip:node[:prilan], gateway:node[:gw], virtualbox__intnet:node[:int]
+    config.vm.network "private_network", :adapter=>3, ip:node[:seclan], gateway:node[:gw], virtualbox__intnet:node[:int]
 
-#    config.disksize.size = node[:disk] # Results in Read-only filesystem!
-
-    config.vm.network "private_network", :adapter=>2, ip:node[:prilan], gateway:node[:prigw], virtualbox__intnet:node[:nat]
-    config.vm.network "public_network", :adapter=>3, type: "dhcp"
-#    config.vm.network "forwarded_port", guest: 22, host: 22, auto_correct: true
+    config.vm.network "forwarded_port", guest: 22, host: 2222, auto_correct: true
+    config.ssh.forward_agent = "true"
+    config.vm.usable_port_range = 2200..2250 # 8199..8999
 
       config.vm.provider:virtualbox do |vb|
         vb.customize ["modifyvm", :id, "--name", node[:hostname]]
@@ -52,6 +51,29 @@ nodes = [
         vb.customize ["modifyvm", :id, "--description", node[:prilan]]
       end
 
+# Modify Network configurations:
+
+    config.vm.provision "shell", inline: "sudo nmcli connection modify 'System enp0s8' ifname enp0s8 con-name enp0s8"
+#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s8' ipv4.addresses 10.0.2.90/24" # already configured
+#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s8' ipv4.dns '8.8.8.8 8.8.4.4'"
+#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s8' connection.autoconnect yes"
+#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s8' ipv6.method ignore"
+#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s8' ipv4.gateway '10.0.2.1'"
+#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s8' ipv4.method manual"
+
+    config.vm.provision "shell", inline: "sudo nmcli connection modify 'System enp0s9' ifname enp0s9 con-name enp0s9"
+#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s8' ipv4.addresses 10.0.2.91/24" # already configured
+#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s9' ipv4.dns '8.8.8.8 8.8.4.4'"
+#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s9' connection.autoconnect yes"
+#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s9' ipv6.method ignore"
+#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s9' ipv4.gateway '10.0.2.1'"
+#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s9' ipv4.method manual"
+
+# Restart Network Profiles:
+
+    config.vm.provision "shell", inline: "sudo systemctl restart systemd-hostnamed", name: "Restart Network Profiles"
+    config.vm.provision "shell", inline: "sudo systemctl restart NetworkManager", name: "Restart NetworkManager"
+
 # TimeDate configuration:
 
     config.vm.provision "shell", inline: "sudo timedatectl set-timezone Europe/Amsterdam", name: "set-timezone Europe/Amsterdam"
@@ -59,30 +81,12 @@ nodes = [
 
 # Security configuration:
 
-    config.vm.provision "shell", inline: "sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config", name: "modify SELINUX=permissive"
-    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=dns", name: "modify Firewall DNS"
-    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=ssh", name: "modify Firewall SSH" # Already enabled
-    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=ntp", name: "modify Firewall NTP"
-    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=ptp", name: "modify Firewall PTP"
+    config.vm.provision "shell", inline: "sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config", name: "modify SELINUX"
+    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=dns"
+    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=ssh" # Already enabled
+    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=ntp"
+    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=ptp"
     config.vm.provision "shell", inline: "sudo firewall-cmd --reload", name: "reload Firewall"
-
-# Modify Network configurations:
-
-#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s3' ipv4.addresses 10.0.2.91/24"
-#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s3' ipv4.gateway 10.0.2.1"
-#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s3' ipv4.dns '8.8.8.8 8.8.4.4'"
-#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s3' connection.autoconnect yes"
-#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s3' ipv6.method ignore"
-#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s3' ipv4.method manual"
-
-    config.vm.provision "shell", inline: "sudo nmcli connection modify 'System enp0s8' ipv4.dns '8.8.8.8 8.8.4.4'"
-    config.vm.provision "shell", inline: "sudo nmcli connection modify 'System enp0s8' connection.autoconnect yes"
-    config.vm.provision "shell", inline: "sudo nmcli connection modify 'System enp0s8' ipv6.method ignore"
-
-# Cleanup Network Profiles:
-
-    config.vm.provision "shell", inline: "sudo systemctl restart systemd-hostnamed", name: "Restart Network Profiles"
-    config.vm.provision "shell", inline: "sudo systemctl restart NetworkManager", name: "Restart NetworkManager"
 
 # Journal log files configuration:
 
@@ -122,6 +126,10 @@ nodes = [
 # Clear Bash history:
 
     config.vm.provision "shell", inline: "history -c", name: "Clear Bash history"
+
+# Cleanup Network Profiles:
+
+#    config.vm.provision "shell", inline: "sudo nmcli con down 'enp0s3'", name: "Disable Vagrant Connection"
 
 # System reboot:
 
