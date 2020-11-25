@@ -8,7 +8,7 @@ cls
 
 # Plugins install:
 vagrant plugin install vagrant-disksize
-vagrant plugin install vagrant-vbguest
+# vagrant plugin install vagrant-vbguest
 
 # Make main directory for Vagrant and change to this directory, change [username] to your own username:
 md C:\Users\[username]\Documents\Vagrant
