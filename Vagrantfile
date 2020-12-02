@@ -51,6 +51,25 @@ nodes = [
         vb.customize ["modifyvm", :id, "--description", node[:prilan]]
       end
 
+# Security configuration:
+
+    config.vm.provision "shell", inline: "sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config", name: "modify SELINUX"
+
+# Firewall configuration:
+
+    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=dns"
+    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=ssh" # Already enabled
+    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=ntp"
+    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=ptp"
+    config.vm.provision "shell", inline: "sudo firewall-cmd --reload", name: "reload Firewall"
+
+# SSH configuration:
+
+    config.vm.provision "shell", inline: "sudo cp /etc/ssh/sshd_config sshd_config.bak", name: "backup SSH configuration"
+    config.vm.provision "shell", inline: "sudo systemctl restart sshd.service", name: "restart SSH service"
+    config.vm.provision "shell", inline: "sudo systemctl enable sshd.service", name: "enable SSH service"
+#    config.vm.provision "shell", inline: "sudo echo 'UseDNS no' >> /etc/ssh/sshd_config", name: "SSH service: UseDNS no"
+
 # Journal log files configuration:
 
     config.vm.provision "shell", inline: "sudo cp /etc/systemd/journald.conf journald.bak", name: "backup Journal log files"
@@ -170,22 +189,6 @@ nodes = [
     config.vm.provision "shell", inline: "sudo chronyc sources >> chronysources.log", name: "Chrony sources log"
     config.vm.provision "shell", inline: "sudo timedatectl >> chronysources.log", name: "Chrony sources log"
 
-# Security configuration:
-
-    config.vm.provision "shell", inline: "sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config", name: "modify SELINUX"
-    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=dns"
-    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=ssh" # Already enabled
-    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=ntp"
-    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=ptp"
-    config.vm.provision "shell", inline: "sudo firewall-cmd --reload", name: "reload Firewall"
-
-# SSH configuration:
-
-    config.vm.provision "shell", inline: "sudo cp /etc/ssh/sshd_config sshd_config.bak", name: "backup SSH configuration"
-    config.vm.provision "shell", inline: "sudo systemctl restart sshd.service", name: "restart SSH service"
-    config.vm.provision "shell", inline: "sudo systemctl enable sshd.service", name: "enable SSH service"
-#    config.vm.provision "shell", inline: "sudo echo 'UseDNS no' >> /etc/ssh/sshd_config", name: "SSH service: UseDNS no"
-
 # Update system:
 
     config.vm.provision "shell", inline: "sudo dnf clean all -y", name: "clean the DNF package repositorycaches"
@@ -222,13 +225,24 @@ nodes = [
 
     config.vm.provision "shell", inline: "sudo dnf install htop nano neofetch tree wget -y", name: "Main packages installation"
 
+# VirtualBox installation:
+
+    config.vm.provision "shell", inline: "sudo dnf config-manager --add-repo=https://download.virtualbox.org/virtualbox/rpm/el/virtualbox.repo", name: Enable Virtualbox repository"
+    config.vm.provision "shell", inline: "sudo dnf install VirtualBox-6.1.16 -y", name: "VirtualBox installation"
+
+    config.vm.provision "shell", inline: "sudo wget https://download.virtualbox.org/virtualbox/6.0.14/Oracle_VM_VirtualBox_Extension_Pack-6.0.16.vbox-extpack", name: "VirtualBox Extension Pack installation"
+    config.vm.provision "shell", inline: "sudo VBoxManage extpack install Oracle_VM_VirtualBox_Extension_Pack-6.0.16.vbox-extpack -y"
+
 # Cockpit installation:
-    config.vm.provision "shell", inline: "sudo dnf install cockpit cockpit-machines cockpit-pcp cockpit-selinux cockpit-storaged PackageKit virt-viewer -y", name: "Cockpit installation"
+
+#    config.vm.provision "shell", inline: "sudo dnf install cockpit cockpit-machines cockpit-pcp cockpit-selinux cockpit-storaged PackageKit virt-viewer -y", name: "Cockpit installation"
 
 # Enable cockpit:
-    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=cockpit", name: "Firewall: enable Cockpit"
-    config.vm.provision "shell", inline: "sudo firewall-cmd --reload"
-    config.vm.provision "shell", inline: "sudo systemctl enable cockpit.socket"
+
+#    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=cockpit", name: "Firewall: enable Cockpit"
+#    config.vm.provision "shell", inline: "sudo firewall-cmd --reload"
+#    config.vm.provision "shell", inline: "sudo systemctl enable cockpit.socket"
+
 # systemctl start libvirtd
 # systemctl enable libvirtd
 
