@@ -191,9 +191,13 @@ nodes = [
 #    config.vm.provision "shell", inline: "sudo dnf upgrade --sec-severity Critical --best -y", name: "upgrade security patches"
 #    config.vm.provision "shell", inline: "sudo dnf upgrade -y", name: "full system update"
 
+# Intel MicroCode installation:
+
+    config.vm.provision "shell", inline: "sudo dnf install iucode-tool -y", name: "Intel MicroCode installation"
+
 # Main packages installation:
 
-    config.vm.provision "shell", inline: "sudo dnf install tree wget -y", name: "Main packages installation"
+    config.vm.provision "shell", inline: "sudo dnf install htop nano neofetch tree wget -y", name: "Main packages installation"
 
 # Additional Package installation:
 
