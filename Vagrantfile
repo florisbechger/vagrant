@@ -51,6 +51,13 @@ nodes = [
         vb.customize ["modifyvm", :id, "--description", node[:prilan]]
       end
 
+# Journal log files configuration:
+
+    config.vm.provision "shell", inline: "sudo cp /etc/systemd/journald.conf journald.bak", name: "backup Journal log files"
+    config.vm.provision "shell", inline: "sudo sed -i 's/#SystemMaxUse=/SystemMaxUse=100M/g' /etc/systemd/journald.conf", name: "Journal log SystemMaxUse=100M"
+    config.vm.provision "shell", inline: "sudo sed -i 's/#SystemMaxFileSize=/SystemMaxFileSize=100M/g' /etc/systemd/journald.conf", name: "Journal log SystemMaxFileSize=100M"
+    config.vm.provision "shell", inline: "sudo sed -i 's/#SystemMaxFiles=/SystemMaxFiles=/g' /etc/systemd/journald.conf", name: "Journal log SystemMaxFiles"
+
 # Modify Network configurations:
 
     config.vm.provision "shell", inline: "sudo nmcli connection modify 'System enp0s8' ifname enp0s8 con-name enp0s8"
@@ -168,13 +175,6 @@ nodes = [
     config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=ptp"
     config.vm.provision "shell", inline: "sudo firewall-cmd --reload", name: "reload Firewall"
 
-# Journal log files configuration:
-
-    config.vm.provision "shell", inline: "sudo cp /etc/systemd/journald.conf journald.bak", name: "backup Journal log files"
-    config.vm.provision "shell", inline: "sudo sed -i 's/#SystemMaxUse=/SystemMaxUse=100M/g' /etc/systemd/journald.conf", name: "Journal log SystemMaxUse=100M"
-    config.vm.provision "shell", inline: "sudo sed -i 's/#SystemMaxFileSize=/SystemMaxFileSize=100M/g' /etc/systemd/journald.conf", name: "Journal log SystemMaxFileSize=100M"
-    config.vm.provision "shell", inline: "sudo sed -i 's/#SystemMaxFiles=/SystemMaxFiles=/g' /etc/systemd/journald.conf", name: "Journal log SystemMaxFiles"
-
 # SSH configuration:
 
     config.vm.provision "shell", inline: "sudo cp /etc/ssh/sshd_config sshd_config.bak", name: "backup SSH configuration"
@@ -191,13 +191,39 @@ nodes = [
 #    config.vm.provision "shell", inline: "sudo dnf upgrade --sec-severity Critical --best -y", name: "upgrade security patches"
 #    config.vm.provision "shell", inline: "sudo dnf upgrade -y", name: "full system update"
 
-# Intel MicroCode installation:
+# MicroCode installation:
 
     config.vm.provision "shell", inline: "sudo dnf install iucode-tool -y", name: "Intel MicroCode installation"
+    config.vm.provision "shell", inline: "sudo dnf install lm_sensors -y", name: "Sensor MicroCode installation"
 
 # Main packages installation:
 
     config.vm.provision "shell", inline: "sudo dnf install htop nano neofetch tree wget -y", name: "Main packages installation"
+
+# Cockpit installation:
+    config.vm.provision "shell", inline: "sudo dnf install cockpit cockpit-machines cockpit-pcp cockpit-selinux cockpit-storaged PackageKit virt-viewer -y", name: "Cockpit installation"
+
+# Enable cockpit:
+    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=cockpit", name: "Firewall: enable Cockpit"
+    config.vm.provision "shell", inline: "sudo firewall-cmd --reload"
+    config.vm.provision "shell", inline: "sudo systemctl enable cockpit.socket"
+# systemctl start libvirtd
+# systemctl enable libvirtd
+
+# visit cockpit: ip-address:9090
+
+# Flatpak installation:
+
+    config.vm.provision "shell", inline: "sudo dnf install flatpak flatpak-selinux flatpak-session-helper -y", name: "Flatpak installation"
+    config.vm.provision "shell", inline: "sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo", name: "Flathub Repo"
+    config.vm.provision "shell", inline: "sudo flatpak remotes", name: "Flatpak synchronize"
+
+# sudo flatpak install flathub notepadqq -y # NotepadQQ
+# sudo flatpak install flathub wps -y # WPS Office
+# sudo flatpak install flathub teams-for-linux -y # Teams
+
+# Check Timers (e.g. ssd-trim):
+    config.vm.provision "shell", inline: "systemctl list-timers --no-pager --all >> timers.log", name: "Check Timers"
 
 # Additional Package installation:
 
