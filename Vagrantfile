@@ -204,6 +204,20 @@ nodes = [
 
     config.vm.provision "shell", inline: "systemctl list-timers --no-pager --all >> timers.log", name: "Check Timers"
 
+# Powerline installation:
+
+    config.vm.provision "shell", inline: "sudo dnf install powerline vim-powerline tmux-powerline powerline-fonts -y", name: "Powerline installation"
+
+    config.vm.provision "shell", inline: "sudo echo '' >> .bashrc"
+    config.vm.provision "shell", inline: "sudo echo '# Powerline' >> .bashrc"
+    config.vm.provision "shell", inline: "sudo echo 'if [ -f `which powerline-daemon` ]; then' >> .bashrc"
+    config.vm.provision "shell", inline: "sudo echo '  powerline-daemon -q' >> .bashrc"
+    config.vm.provision "shell", inline: "sudo echo '  POWERLINE_BASH_CONTINUATION=1' >> .bashrc"
+    config.vm.provision "shell", inline: "sudo echo '  POWERLINE_BASH_SELECT=1' >> .bashrc"
+    config.vm.provision "shell", inline: "sudo echo '  . /usr/share/powerline/bash/powerline.sh' >> .bashrc"
+    config.vm.provision "shell", inline: "sudo echo 'fi' >> .bashrc"
+    config.vm.provision "shell", inline: "sudo echo '' >> .bashrc"
+
 # Main packages installation:
 
     config.vm.provision "shell", inline: "sudo dnf install htop nano neofetch tree wget -y", name: "Main packages installation"
@@ -243,20 +257,6 @@ nodes = [
 # Additional Package installation:
 
     # config.vm.provision "shell", path: node[:addon], name: "Additional Package installation"
-
-# Powerline installation:
-
-    config.vm.provision "shell", inline: "sudo dnf install powerline vim-powerline tmux-powerline powerline-fonts -y", name: "Powerline installation"
-
-    config.vm.provision "shell", inline: "sudo echo '' >> .bashrc"
-    config.vm.provision "shell", inline: "sudo echo '# Powerline' >> .bashrc"
-    config.vm.provision "shell", inline: "sudo echo 'if [ -f `which powerline-daemon` ]; then' >> .bashrc"
-    config.vm.provision "shell", inline: "sudo echo '  powerline-daemon -q' >> .bashrc"
-    config.vm.provision "shell", inline: "sudo echo '  POWERLINE_BASH_CONTINUATION=1' >> .bashrc"
-    config.vm.provision "shell", inline: "sudo echo '  POWERLINE_BASH_SELECT=1' >> .bashrc"
-    config.vm.provision "shell", inline: "sudo echo '  . /usr/share/powerline/bash/powerline.sh' >> .bashrc"
-    config.vm.provision "shell", inline: "sudo echo 'fi' >> .bashrc"
-    config.vm.provision "shell", inline: "sudo echo '' >> .bashrc"
 
 # Clear Page Cache, dentries and inodes:
 
