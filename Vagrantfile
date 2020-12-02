@@ -51,6 +51,10 @@ nodes = [
         vb.customize ["modifyvm", :id, "--description", node[:prilan]]
       end
 
+# Certificates installation:
+
+    config.vm.provision "shell", inline: "sudo dnf reinstall openssl ca-certificates -y", name: "Certificates installation"
+
 # Journal log files configuration:
 
     config.vm.provision "shell", inline: "sudo cp /etc/systemd/journald.conf journald.bak", name: "backup Journal log files"
@@ -239,6 +243,20 @@ nodes = [
 # Additional Package installation:
 
     # config.vm.provision "shell", path: node[:addon], name: "Additional Package installation"
+
+# Powerline installation:
+
+    config.vm.provision "shell", inline: "sudo dnf install powerline vim-powerline tmux-powerline powerline-fonts -y", name: "Powerline installation"
+
+    config.vm.provision "shell", inline: "sudo echo '' >> .bashrc"
+    config.vm.provision "shell", inline: "sudo echo '# Powerline' >> .bashrc"
+    config.vm.provision "shell", inline: "sudo echo 'if [ -f `which powerline-daemon` ]; then' >> .bashrc"
+    config.vm.provision "shell", inline: "sudo echo '  powerline-daemon -q' >> .bashrc"
+    config.vm.provision "shell", inline: "sudo echo '  POWERLINE_BASH_CONTINUATION=1' >> .bashrc"
+    config.vm.provision "shell", inline: "sudo echo '  POWERLINE_BASH_SELECT=1' >> .bashrc"
+    config.vm.provision "shell", inline: "sudo echo '  . /usr/share/powerline/bash/powerline.sh' >> .bashrc"
+    config.vm.provision "shell", inline: "sudo echo 'fi' >> .bashrc"
+    config.vm.provision "shell", inline: "sudo echo '' >> .bashrc"
 
 # Clear Page Cache, dentries and inodes:
 
