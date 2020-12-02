@@ -51,10 +51,6 @@ nodes = [
         vb.customize ["modifyvm", :id, "--description", node[:prilan]]
       end
 
-# Certificates installation:
-
-    config.vm.provision "shell", inline: "sudo dnf reinstall openssl ca-certificates -y", name: "Certificates installation"
-
 # Journal log files configuration:
 
     config.vm.provision "shell", inline: "sudo cp /etc/systemd/journald.conf journald.bak", name: "backup Journal log files"
@@ -170,6 +166,8 @@ nodes = [
     config.vm.provision "shell", inline: "sudo echo '#log measurements statistics tracking' >> /etc/chrony.conf"
     config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
 
+    config.vm.provision "shell", inline: "sudo chronyc >> chrony-sources.log", name: "Log Chrony sources"
+
 # Security configuration:
 
     config.vm.provision "shell", inline: "sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config", name: "modify SELINUX"
@@ -257,6 +255,10 @@ nodes = [
 # Additional Package installation:
 
     # config.vm.provision "shell", path: node[:addon], name: "Additional Package installation"
+
+# Certificates re-installation:
+
+#    config.vm.provision "shell", inline: "sudo dnf reinstall openssl ca-certificates -y", name: "Certificates re-installation"
 
 # Clear Page Cache, dentries and inodes:
 
