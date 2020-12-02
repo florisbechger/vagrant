@@ -166,7 +166,8 @@ nodes = [
     config.vm.provision "shell", inline: "sudo echo '#log measurements statistics tracking' >> /etc/chrony.conf"
     config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
 
-    config.vm.provision "shell", inline: "sudo chronyc >> chrony-sources.log", name: "Log Chrony sources"
+    config.vm.provision "shell", inline: "sudo chronyc sources >> chronysources.log", name: "Chrony sources log"
+    config.vm.provision "shell", inline: "sudo timedatectl >> chronysources.log", name: "Chrony sources log"
 
 # Security configuration:
 
