@@ -196,6 +196,10 @@ nodes = [
     config.vm.provision "shell", inline: "sudo dnf install iucode-tool -y", name: "Intel MicroCode installation"
     config.vm.provision "shell", inline: "sudo dnf install lm_sensors -y", name: "Sensor MicroCode installation"
 
+# Check Timers (e.g. ssd-trim):
+
+    config.vm.provision "shell", inline: "systemctl list-timers --no-pager --all >> timers.log", name: "Check Timers"
+
 # Main packages installation:
 
     config.vm.provision "shell", inline: "sudo dnf install htop nano neofetch tree wget -y", name: "Main packages installation"
@@ -222,8 +226,15 @@ nodes = [
 # sudo flatpak install flathub wps -y # WPS Office
 # sudo flatpak install flathub teams-for-linux -y # Teams
 
-# Check Timers (e.g. ssd-trim):
-    config.vm.provision "shell", inline: "systemctl list-timers --no-pager --all >> timers.log", name: "Check Timers"
+# Development Tools installation:
+
+    config.vm.provision "shell", inline: "sudo dnf groupinstall 'Development Tools' -y", name: "Flatpak synchronize"
+
+# Toolbox installation:
+
+    config.vm.provision "shell", inline: "sudo git clone 'https://github.com/containers/toolbox.git'", name: "Clone Toolbox git"
+    config.vm.provision "shell", inline: "sudo dnf install toolbox -y", name: "Toolbox installation"
+    config.vm.provision "shell", inline: "toolbox create -c Test -y", name: "Create Toolbox Test"
 
 # Additional Package installation:
 
