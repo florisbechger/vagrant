@@ -225,9 +225,13 @@ nodes = [
 
     config.vm.provision "shell", inline: "sudo dnf install htop nano neofetch tree wget -y", name: "Main packages installation"
 
+# Development Tools installation:
+
+    config.vm.provision "shell", inline: "sudo dnf groupinstall 'Development Tools' -y", name: "Development Tools installation"
+
 # VirtualBox installation:
 
-    config.vm.provision "shell", inline: "sudo dnf config-manager --add-repo=https://download.virtualbox.org/virtualbox/rpm/el/virtualbox.repo", name: Enable Virtualbox repository"
+    config.vm.provision "shell", inline: "sudo dnf config-manager --add-repo=https://download.virtualbox.org/virtualbox/rpm/el/virtualbox.repo", name: "Enable Virtualbox repository"
     config.vm.provision "shell", inline: "sudo dnf install VirtualBox-6.1.16 -y", name: "VirtualBox installation"
 
     config.vm.provision "shell", inline: "sudo wget https://download.virtualbox.org/virtualbox/6.0.14/Oracle_VM_VirtualBox_Extension_Pack-6.0.16.vbox-extpack", name: "VirtualBox Extension Pack installation"
@@ -237,7 +241,7 @@ nodes = [
 
 #    config.vm.provision "shell", inline: "sudo dnf install cockpit cockpit-machines cockpit-pcp cockpit-selinux cockpit-storaged PackageKit virt-viewer -y", name: "Cockpit installation"
 
-# Enable cockpit:
+# Enable Cockpit:
 
 #    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=cockpit", name: "Firewall: enable Cockpit"
 #    config.vm.provision "shell", inline: "sudo firewall-cmd --reload"
@@ -257,10 +261,6 @@ nodes = [
 # sudo flatpak install flathub notepadqq -y # NotepadQQ
 # sudo flatpak install flathub wps -y # WPS Office
 # sudo flatpak install flathub teams-for-linux -y # Teams
-
-# Development Tools installation:
-
-    config.vm.provision "shell", inline: "sudo dnf groupinstall 'Development Tools' -y", name: "Flatpak synchronize"
 
 # Toolbox installation:
 
