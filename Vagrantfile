@@ -79,6 +79,86 @@ nodes = [
     config.vm.provision "shell", inline: "sudo timedatectl set-timezone Europe/Amsterdam", name: "set-timezone Europe/Amsterdam"
     config.vm.provision "shell", inline: "sudo hwclock -w", name: "sync hwclock"
 
+# Chrony installation:
+
+    config.vm.provision "shell", inline: "sudo dnf install chrony -y", name: "Chrony installation"
+
+# Chrony configuration:
+
+    config.vm.provision "shell", inline: "sudo cp /etc/chrony.conf chrony.bak", name: "backup old Chrony configuration"
+    config.vm.provision "shell", inline: "sudo echo '# Customized configuration:' > /etc/chrony.conf", name: "create new Chrony configuration"
+    config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo '# These servers were defined in the Vagrant configuration:' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo 'server nts1.time.nl iburst nts' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo '# Use public servers from the pool.ntp.org project.' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '# Please consider joining the pool (https://www.pool.ntp.org/join.html).' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo '# Use NTP servers from DHCP.' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo 'sourcedir /run/chrony-dhcp' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo '# Record the rate at which the system clock gains/losses time.' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#driftfile /var/lib/chrony/drift' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo '# Allow the system clock to be stepped in the first three updates' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '# if its offset is larger than 1 second.' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo 'makestep 1.0 3' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo '# Enable kernel synchronization of the real-time clock (RTC).' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo 'rtcsync' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo '# Enable hardware timestamping on all interfaces that support it.' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#hwtimestamp *' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo '# Increase the minimum number of selectable sources required to adjust' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '# the system clock.' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#minsources 2' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo '# Allow NTP client access from local network.' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#allow 192.168.0.0/16' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo '# Serve time even if not synchronized to a time source.' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo 'local stratum 8' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo '# Require authentication (nts or key option) for all NTP sources.' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#authselectmode require' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo '# Specify file containing keys for NTP authentication.' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo 'keyfile /etc/chrony.keys' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo '# Save NTS keys and cookies.' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo 'ntsdumpdir /var/lib/chrony' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo '# Insert/delete leap seconds by slewing instead of stepping.' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#leapsecmode slew' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo '# Get TAI-UTC offset and leap seconds from the system tz database.' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo 'leapsectz right/UTC' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo '# Specify directory for log files.' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo 'logdir /var/log/chrony' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
+
+    config.vm.provision "shell", inline: "sudo echo '# Select which information is logged.' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#log measurements statistics tracking' >> /etc/chrony.conf"
+    config.vm.provision "shell", inline: "sudo echo '#' >> /etc/chrony.conf"
+
 # Security configuration:
 
     config.vm.provision "shell", inline: "sudo sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config", name: "modify SELINUX"
@@ -113,7 +193,7 @@ nodes = [
 
 # Main packages installation:
 
-    config.vm.provision "shell", inline: "sudo dnf install nano tree wget -y", name: "Main packages installation"
+    config.vm.provision "shell", inline: "sudo dnf install tree wget -y", name: "Main packages installation"
 
 # Additional Package installation:
 
