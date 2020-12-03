@@ -197,6 +197,7 @@ nodes = [
     config.vm.provision "shell", inline: "sudo dnf upgrade-minimal -y", name: "only install absolutely required security patches"
 #    config.vm.provision "shell", inline: "sudo dnf upgrade --sec-severity Critical --best -y", name: "upgrade security patches"
 #    config.vm.provision "shell", inline: "sudo dnf upgrade -y", name: "full system update"
+    config.vm.provision "shell", inline: "sudo dnf install epel-release -y", name: "epel-release installation"
 
 # MicroCode installation:
 
