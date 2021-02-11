@@ -23,6 +23,7 @@ vagrant halt <machine> # stop node
 VBoxManage unregistervm <machine> --delete # unregister node
 vagrant destroy <machine> -f # delete node
 vagrant global-status --prune # delete obsolete nodes
+rm /home/[Username]/Documents/Virtualbox/.vagrant/machines/<machine>
 
 # Other commands:
 vagrant box remove centos.box # Unregister the image from Vagrant
