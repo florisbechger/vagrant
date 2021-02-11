@@ -1,5 +1,6 @@
+
 # Vagrantfile 2020/12/05
-# VirtualBox Version 6.1.16
+# VirtualBox Version 6.1.18
 # Vagrant Version 2.2.14
 
 Vagrant.require_version ">= 2.2.14"
@@ -7,7 +8,7 @@ Vagrant.require_version ">= 2.2.14"
 Vagrant.configure("2") do |config|
 
 nodes = [
-    { hostname:'test', prilan:'10.0.2.90', seclan:'10.0.2.91', gw:'10.0.2.1', int:'intnet', cpu:'2', mem:'4096', vram:'16', graphic:'VBoxVGA', acc3d:'off', box:'centos.box', disk:'40GB', addon:'[path\to\test.sh]', dns: '89.101.251.228 89.101.251.229'},
+    { hostname:'test', prilan:'10.0.0.91', seclan:'10.0.0.92', thilan:'10.0.0.93', netmask:'255.255.255.0', nictype:'virtio', gw:'10.0.0.1', int:'intnet', forward:'none', cpu:'2', mem:'4096', vram:'16', graphic:'VBoxVGA', acc3d:'off', box:'centos.box', disk:'30GB', addon:'[path\to\test.sh]', dns: '89.101.251.228 89.101.251.229'},
 #    { [another node] },
     ]
 
@@ -15,7 +16,7 @@ nodes = [
 
 # Nodes configuration:
 
-    config.vagrant.host = "windows"
+    config.vagrant.host = "linux"
     config.vm.provider "virtualbox"
 
     config.vm.ignore_box_vagrantfile = true
@@ -33,9 +34,9 @@ nodes = [
 
     config.disksize.size = node[:disk]
 
-    config.vm.base_address = node[:prilan]
-    config.vm.network "private_network", :adapter=>2, ip:node[:prilan], gateway:node[:gw], virtualbox__intnet:node[:int]
-    config.vm.network "private_network", :adapter=>3, ip:node[:seclan], gateway:node[:gw], virtualbox__intnet:node[:int]
+#    config.vm.base_address = node[:prilan]
+    config.vm.network "private_network", :adapter=>2, ip:node[:seclan], netmask:node[:netmask], nic_type:node[:nictype], gateway:node[:gw], dhcp_enabled: false, virtualbox__intnet:node[:int], forward_mode:[node:forward]
+    config.vm.network "private_network", :adapter=>3, ip:node[:thilan], netmask:node[:netmask], nic_type:node[:nictype], gateway:node[:gw], dhcp_enabled: false, virtualbox__intnet:node[:int], forward_mode:[node:forward]
 
     config.vm.network "forwarded_port", guest: 22, host: 2222, auto_correct: true
     config.ssh.forward_agent = "true"
@@ -65,7 +66,7 @@ nodes = [
 # Firewall configuration:
 
     config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=dns"
-    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=ssh" # Already enabled
+    config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=ssh" # already enabled
     config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=ntp"
     config.vm.provision "shell", inline: "sudo firewall-cmd --permanent --zone=public --add-service=ptp"
     config.vm.provision "shell", inline: "sudo firewall-cmd --reload"
@@ -80,19 +81,19 @@ nodes = [
 # Modify Network configurations:
 
     config.vm.provision "shell", inline: "sudo nmcli connection modify 'System enp0s8' ifname enp0s8 con-name enp0s8"
-#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s8' ipv4.addresses 10.0.2.90/24" # already configured
+#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s8' ipv4.addresses 10.0.0.90/24" # already configured
 #    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s8' ipv4.dns '8.8.8.8 8.8.4.4'"
 #    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s8' connection.autoconnect yes"
 #    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s8' ipv6.method ignore"
-#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s8' ipv4.gateway '10.0.2.1'"
+#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s8' ipv4.gateway '10.0.0.1'"
 #    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s8' ipv4.method manual"
 
     config.vm.provision "shell", inline: "sudo nmcli connection modify 'System enp0s9' ifname enp0s9 con-name enp0s9"
-#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s8' ipv4.addresses 10.0.2.91/24" # already configured
+#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s8' ipv4.addresses 10.0.0.91/24" # already configured
 #    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s9' ipv4.dns '8.8.8.8 8.8.4.4'"
 #    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s9' connection.autoconnect yes"
 #    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s9' ipv6.method ignore"
-#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s9' ipv4.gateway '10.0.2.1'"
+#    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s9' ipv4.gateway '10.0.0.1'"
 #    config.vm.provision "shell", inline: "sudo nmcli connection modify 'enp0s9' ipv4.method manual"
 
 # Restart Network Profiles:
