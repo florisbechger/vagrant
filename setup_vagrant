@@ -1,11 +1,11 @@
 
 # Setup Vagrant in Linux:
-cd ~/Documents/Virtualbox
 vagrant --version # verify version
 vagrant plugin install vagrant-disksize
 vagrant plugin list # verify install
 
 # Prepare your own .box for cloning:
+cd ~/Documents/Virtualbox
 vagrant package --base centos --output centos.box
 vagrant box add --name centos.box /home/[Username]/Documents/Virtualbox/centos.box
 vagrant box list # verify box
