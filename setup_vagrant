@@ -30,3 +30,4 @@ rm /home/[Username]/Documents/Virtualbox/.vagrant/machines/<machine> -r
 # Other commands:
 vagrant box remove centos.box # Unregister the image from Vagrant
 rm centos.box # Delete the image entirely
+sudo rm ~/.vagrant.d/data/lock.* # Remove lock-files in case of a line 115 error in Vagrantfile
