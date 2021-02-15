@@ -1,5 +1,5 @@
 
-# Vagrantfile 2020/12/05
+# Vagrantfile 2021/02/15
 # VirtualBox Version 6.1.18
 # Vagrant Version 2.2.14
 # Centos 8 Stream LVM
@@ -94,13 +94,6 @@ nodes = [
     config.vm.provision "shell", inline: "sudo systemctl restart sshd.service"
     config.vm.provision "shell", inline: "sudo systemctl enable sshd.service"
 
-# Update system:
-    config.vm.provision "shell", inline: "sudo dnf clean all -y", name: "clean the DNF package repositorycaches"
-    config.vm.provision "shell", inline: "sudo dnf makecache -y", name: "update the DNF package repository cache"
-    config.vm.provision "shell", inline: "sudo dnf autoremove -y", name: "remove unnecessary packages if available"
-    config.vm.provision "shell", inline: "sudo dnf upgrade --sec-severity Critical --best -y", name: "upgrade security patches"
-#    config.vm.provision "shell", inline: "sudo dnf upgrade-minimal -y", name: "only newest patches to possibly resolve an issue"
-
 # Clear Page Cache, dentries and inodes:
     config.vm.provision "shell", inline: "sudo sync; echo 3 > /proc/sys/vm/drop_caches"
 
@@ -112,6 +105,12 @@ nodes = [
 
 # Certificates re-installation:
 #    config.vm.provision "shell", inline: "sudo dnf reinstall openssl ca-certificates -y"
+
+# Update system:
+#    config.vm.provision "shell", inline: "sudo dnf autoremove -y", name: "remove unnecessary packages if available"
+#    config.vm.provision "shell", inline: "sudo dnf clean all -y", name: "clean the DNF package repositorycaches"
+#    config.vm.provision "shell", inline: "sudo dnf makecache -y", name: "update the DNF package repository cache"
+#    config.vm.provision "shell", inline: "sudo dnf upgrade --sec-severity Critical --best -y", name: "upgrade security patches"
 
 # Additional Package installation:
 #    config.vm.provision "shell", path: node[:addon]
